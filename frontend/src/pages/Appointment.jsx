@@ -58,7 +58,7 @@ const Appointment = () => {
                 let formattedTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 let day = currentDate.getDate()
-                let month = currentDate.getMonth() 
+                let month = currentDate.getMonth() + 1
                 let year = currentDate.getFullYear()
 
                 const slotDate = day + "_" + month + "_" + year
