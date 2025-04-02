@@ -14,7 +14,7 @@ doctorRouter.get("/profile", authDoctor, doctorProfile)
 doctorRouter.post("/update-profile", authDoctor, updateDoctorProfile)
 // doctorRoutes.js
 
-import express from 'express';
+
 import doctorModel from '../models/doctorModel';  // Import the doctor model
 import authMiddleware from '../middlewares/authMiddleware'; // Check if the user is authorized
 
