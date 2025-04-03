@@ -1,6 +1,9 @@
+// Import required modules
 import express from "express";
 import cors from "cors";
-import "dotenv/config";
+import "dotenv/config"; // Load environment variables from .env file
+
+// Import custom configuration and route files (assumed to exist in your project)
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
 import userRouter from "./routes/userRoute.js";
@@ -8,33 +11,37 @@ import doctorRouter from "./routes/doctorRoute.js";
 import adminRouter from "./routes/adminRoute.js";
 import medicalRoutes from "./routes/medicalRoutes.js";
 
-// App config
+// Initialize Express app
 const app = express();
-// Use environment variable PORT or default to 4000 (Render.com will override with its assigned port)
+
+// Set port: Use Render's assigned PORT or default to 4000 for local development
 const port = process.env.PORT || 4000;
 
-connectDB();
-connectCloudinary();
+// Connect to external services (MongoDB and Cloudinary)
+connectDB(); // Assumes this connects to your MongoDB instance
+connectCloudinary(); // Assumes this sets up Cloudinary
 
-// Middlewares
-app.use(express.json()); // Parse JSON request bodies
-app.use(cors({ origin: "*", methods: ["GET", "POST", "PUT", "DELETE"] }));
+// Middleware setup
+app.use(express.json()); // Parse incoming JSON requests
+app.use(cors({ 
+  origin: "*", // Allow all origins (adjust for production if needed)
+  methods: ["GET", "POST", "PUT", "DELETE"] // Allowed HTTP methods
+}));
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded form data (optional)
 
-// API endpoints
-app.use("/api/user", userRouter);
-app.use("/api/admin", adminRouter);
-app.use("/api/doctor", doctorRouter);
-app.use("/api/medical-records", medicalRoutes);
+// Define API routes
+app.use("/api/user", userRouter); // User-related endpoints
+app.use("/api/admin", adminRouter); // Admin-related endpoints
+app.use("/api/doctor", doctorRouter); // Doctor-related endpoints
+app.use("/api/medical-records", medicalRoutes); // Medical records endpoints
 
-app.use(express.urlencoded({ extended: true })); // Handle URL-encoded form data (optional)
-
-// Home endpoint
+// Root endpoint for testing
 app.get("/", (req, res) => {
-  res.send("API Working");
+  res.send("API Working - Server is live!");
 });
 
-// Start server and log the port for confirmation
+// Start the server
 app.listen(port, "0.0.0.0", () => {
-  console.log(`Server started on http://0.0.0.0:${port}`);
-  console.log(`Listening on port: ${port}`); // Explicitly log the port in use
+  console.log(`Server running on http://0.0.0.0:${port}`);
+  console.log(`Environment port: ${process.env.PORT || "not set, using default"}`);
 });
