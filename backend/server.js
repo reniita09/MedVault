@@ -22,7 +22,7 @@ dotenv.config();
 
 // Initialize Express app
 const app = express();
-const port = process.env.PORT || 4000; // Render assigns PORT, 4000 for local
+const port = process.env.PORT || 10000; // Render assigns PORT, 10000 for local
 
 // MongoDB connection
 const connectDB = async () => {
