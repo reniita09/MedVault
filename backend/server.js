@@ -1,47 +1,81 @@
-// Import required modules
 import express from "express";
 import cors from "cors";
-import "dotenv/config"; // Load environment variables from .env file
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "cloudinary";
+import multer from "multer";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import validator from "validator";
+import Razorpay from "razorpay";
+import Stripe from "stripe";
 
-// Import custom configuration and route files (assumed to exist in your project)
-import connectDB from "./config/mongodb.js";
-import connectCloudinary from "./config/cloudinary.js";
+// Import route files (assumed to exist in your project)
 import userRouter from "./routes/userRoute.js";
 import doctorRouter from "./routes/doctorRoute.js";
 import adminRouter from "./routes/adminRoute.js";
 import medicalRoutes from "./routes/medicalRoutes.js";
 
+// Load environment variables
+dotenv.config();
+
 // Initialize Express app
 const app = express();
+const port = process.env.PORT || 4000; // Render assigns PORT, 4000 for local
 
-// Set port: Use Render's assigned PORT or default to 4000 for local development
-const port = process.env.PORT || 4000;
+// MongoDB connection
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    process.exit(1); // Exit if DB connection fails
+  }
+};
 
-// Connect to external services (MongoDB and Cloudinary)
-connectDB(); // Assumes this connects to your MongoDB instance
-connectCloudinary(); // Assumes this sets up Cloudinary
+// Cloudinary configuration
+const connectCloudinary = () => {
+  cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  console.log("Cloudinary configured");
+};
 
-// Middleware setup
-app.use(express.json()); // Parse incoming JSON requests
-app.use(cors({ 
-  origin: "*", // Allow all origins (adjust for production if needed)
-  methods: ["GET", "POST", "PUT", "DELETE"] // Allowed HTTP methods
-}));
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded form data (optional)
+// Middleware
+app.use(express.json()); // Parse JSON bodies
+app.use(cors({ origin: "*", methods: ["GET", "POST", "PUT", "DELETE"] }));
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
 
-// Define API routes
-app.use("/api/user", userRouter); // User-related endpoints
-app.use("/api/admin", adminRouter); // Admin-related endpoints
-app.use("/api/doctor", doctorRouter); // Doctor-related endpoints
-app.use("/api/medical-records", medicalRoutes); // Medical records endpoints
+// Initialize external services
+connectDB();
+connectCloudinary();
 
-// Root endpoint for testing
+// Routes
+app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/doctor", doctorRouter);
+app.use("/api/medical-records", medicalRoutes);
+
+// Root endpoint
 app.get("/", (req, res) => {
-  res.send("API Working - Server is live!");
+  res.send("API Working - Backend Server is Live!");
 });
 
-// Start the server
+// Error handling middleware (basic)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
+});
+
+// Start server
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on http://0.0.0.0:${port}`);
-  console.log(`Environment port: ${process.env.PORT || "not set, using default"}`);
+  console.log(`Environment port: ${process.env.PORT || "not set, using 4000"}`);
 });
