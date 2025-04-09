@@ -139,7 +139,7 @@ const AdminContextProvider = (props) => {
     const editDoctor = async (doctorId, formData) => {
         try {
             const { data } = await axios.put(
-                ${backendUrl}/api/admin/edit-doctor/${doctorId},
+                `${backendUrl}/api/admin/edit-doctor/${doctorId}`,
                 formData,
                 {
                     headers: {
