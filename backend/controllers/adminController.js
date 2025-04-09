@@ -125,6 +125,49 @@ const allDoctors = async (req, res) => {
     }
 }
 
+// API to edit doctor
+const editDoctor = async (req, res) => {
+    try {
+        const doctorId = req.params.id;
+        const { name, email, degree, speciality, experience, fees } = req.body;
+
+        let updatedFields = {
+            name,
+            email,
+            degree,
+            speciality,
+            experience,
+            fees,
+        };
+
+        // If image is uploaded, upload to Cloudinary
+        if (req.file) {
+            const imageUpload = await cloudinary.uploader.upload(req.file.path, {
+                resource_type: "image",
+            });
+            updatedFields.image = imageUpload.secure_url;
+        }
+
+        await doctorModel.findByIdAndUpdate(doctorId, updatedFields);
+        res.json({ success: true, message: "Doctor updated successfully" });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+
+const deleteDoctor = async (req, res) => {
+    try {
+        const doctorId = req.params.id;
+        await doctorModel.findByIdAndDelete(doctorId);
+        res.json({ success: true, message: "Doctor deleted successfully" });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
 // API to get dashboard data for admin panel
 const adminDashboard = async (req, res) => {
     try {
@@ -154,5 +197,7 @@ export {
     appointmentCancel,
     addDoctor,
     allDoctors,
-    adminDashboard
-}
+    adminDashboard,
+    editDoctor,
+    deleteDoctor,
+};
