@@ -36,7 +36,7 @@ const AdminContextProvider = (props) => {
     const deleteDoctor = async (doctorId) => {
         try {
             const { data } = await axios.delete(
-                ${backendUrl}/api/admin/delete-doctor/${doctorId},
+                `${backendUrl}/api/admin/delete-doctor/${doctorId}`,
                 {
                     headers: {
                         aToken
