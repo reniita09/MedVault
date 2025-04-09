@@ -33,6 +33,30 @@ const AdminContextProvider = (props) => {
 
     }
 
+    const deleteDoctor = async (doctorId) => {
+        try {
+            const { data } = await axios.delete(
+                ${backendUrl}/api/admin/delete-doctor/${doctorId},
+                {
+                    headers: {
+                        aToken
+                    }
+                }
+            );
+
+            if (data.success) {
+                toast.success(data.message);
+                getAllDoctors(); // Refresh list
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+        }
+    };
+
+
     // Function to change doctor availablity using API
     const changeAvailability = async (docId) => {
         try {
@@ -111,6 +135,38 @@ const AdminContextProvider = (props) => {
 
     }
 
+    // Function to edit doctor info using API
+    const editDoctor = async (doctorId, formData) => {
+        try {
+            const { data } = await axios.put(
+                ${backendUrl}/api/admin/edit-doctor/${doctorId},
+                formData,
+                {
+                    headers: {
+                        aToken,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            if (data.success) {
+                toast.success(data.message);
+                getAllDoctors(); // Refresh doctor list
+            } else {
+                toast.error(data.message);
+            }
+
+            return data;
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+            return { success: false, message: error.message };
+        }
+    };
+
+
+
+
     const value = {
         aToken, setAToken,
         doctors,
@@ -120,8 +176,12 @@ const AdminContextProvider = (props) => {
         getAllAppointments,
         getDashData,
         cancelAppointment,
-        dashData
-    }
+        dashData,
+        editDoctor,
+        deleteDoctor
+
+    };
+
 
     return (
         <AdminContext.Provider value={value}>
